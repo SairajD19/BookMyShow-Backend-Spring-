@@ -77,4 +77,23 @@ public class TicketService {
         return "Ticket Booked!";
 
     }
+
+    public String cancelTicket(int ticketId){
+        TicketEntity ticket = ticketRepository.findById(ticketId).get();
+        ticket.setAmount(0);
+        ticket.setAllotedSeats("Cancelled!");
+
+        List<ShowSeatEntity> showSeats = ticket.getListOfShowSeats();
+        for(ShowSeatEntity seat: showSeats){
+            seat.setBooked(false);
+            seat.setBookedAt(null);
+            seat.setTicket(null);
+        }
+
+        ShowEntity show = ticket.getShow();
+        show.getListOfTickets().remove(ticket);
+
+        ticketRepository.save(ticket);
+        return "Ticket Cancelled Successfully";
+    }
 }

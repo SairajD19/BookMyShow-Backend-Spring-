@@ -1,10 +1,18 @@
 package com.example.Book_my_show_backend.Services;
 
 import com.example.Book_my_show_backend.Models.MovieEntity;
+import com.example.Book_my_show_backend.Models.ShowEntity;
+import com.example.Book_my_show_backend.ReponseDTOs.ShowsResponseDto;
 import com.example.Book_my_show_backend.Repositories.MovieRepository;
 import com.example.Book_my_show_backend.RequestDTOs.MovieDTO;
+import com.example.Book_my_show_backend.RequestDTOs.MovieShows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -20,5 +28,20 @@ public class MovieService {
             return "Movie Creation Failed";
         }
         return "Movie Created!";
+    }
+
+    public List<ShowsResponseDto> allShows(MovieShows movieShows){
+
+        MovieEntity movie = movieRepository.findByMovieName(movieShows.getMovieName());
+        List<ShowEntity> shows = movie.getShows();
+        List<ShowsResponseDto> showsAvailable = new ArrayList<>();
+        for(ShowEntity show: shows){
+            if(show.getShowDate().isBefore(movieShows.getToDate()) || show.getShowDate().isAfter(movieShows.getFromDate()) || show.getShowDate().isEqual(movieShows.getFromDate()) || show.getShowDate().isEqual(movieShows.getToDate())){
+                ShowsResponseDto showsResponseDto = ShowsResponseDto.builder().city(show.getTheater().getCity()).theaterName(show.getTheater().getName()).movieName(movieShows.getMovieName()).showTime(show.getShowTime()).showDate(show.getShowDate()).build();
+                showsAvailable.add(showsResponseDto);
+            }
+        }
+        return  showsAvailable;
+
     }
 }
