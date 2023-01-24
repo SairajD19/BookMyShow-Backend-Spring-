@@ -30,17 +30,26 @@ public class MovieService {
         return "Movie Created!";
     }
 
-    public List<ShowsResponseDto> allShows(MovieShows movieShows){
+    public List<ShowsResponseDto> allShows(MovieShows movieShows)throws Exception{
 
         MovieEntity movie = movieRepository.findByMovieName(movieShows.getMovieName());
         List<ShowEntity> shows = movie.getShows();
         List<ShowsResponseDto> showsAvailable = new ArrayList<>();
         for(ShowEntity show: shows){
-            if(show.getShowDate().isBefore(movieShows.getToDate()) || show.getShowDate().isAfter(movieShows.getFromDate()) || show.getShowDate().isEqual(movieShows.getFromDate()) || show.getShowDate().isEqual(movieShows.getToDate())){
+            boolean flag = false;
+            if(show.getShowDate().isBefore(movieShows.getToDate()) && show.getShowDate().isAfter(movieShows.getFromDate()))
+                flag = true;
+            else if(show.getShowDate().equals(movieShows.getFromDate()))
+                flag = true;
+            else if(show.getShowDate().equals(movieShows.getToDate()))
+                flag = true;
+            if(flag){
                 ShowsResponseDto showsResponseDto = ShowsResponseDto.builder().city(show.getTheater().getCity()).theaterName(show.getTheater().getName()).movieName(movieShows.getMovieName()).showTime(show.getShowTime()).showDate(show.getShowDate()).build();
                 showsAvailable.add(showsResponseDto);
             }
         }
+        if(showsAvailable.isEmpty())
+            throw new Exception("No shows available in dates!");
         return  showsAvailable;
 
     }

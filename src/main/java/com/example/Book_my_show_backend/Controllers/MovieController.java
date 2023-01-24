@@ -22,7 +22,8 @@ public class MovieController {
     }
 
     @GetMapping("/find_shows")
-    public List<ShowsResponseDto> findShows(@RequestBody()MovieShows movieShows){
-        return movieService.allShows(movieShows);
+    public List<ShowsResponseDto> findShows(@RequestBody()MovieShows movieShows) throws Exception{
+
+            return movieService.allShows(movieShows);
     }
 }
